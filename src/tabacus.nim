@@ -1,4 +1,5 @@
 import system
+import lexer
 
 proc main(): int =
   while true:
@@ -22,11 +23,12 @@ proc main(): int =
       break
 
     # TODO: Call Lexer
-    
+    var tokens: seq[string] = mathLexer(line)
     # TODO: Calculate and return result
     # dispatch commands here
-    echo "→ ", line # TODO: Print result
-
+    echo "line → ", line
+    echo "tokens → ", tokens
+    # TODO: print result
     
 
 when isMainModule:
