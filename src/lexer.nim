@@ -7,16 +7,16 @@ type
     value*: string
 
 proc mathLexer*(input: string): seq[Token] =
-  var i = 0
+  var i: int = 0
   
   while i < input.len:
-    let c = input[i]
+    let c: char = input[i]
 
     case c
     of ' ', '\t', '\r', '\n':
       inc i 
     of '0'..'9':
-      var num = ""
+      var num: string = ""
       # Keep consuming as long as it's a digit
       while i < input.len and input[i] in '0'..'9':
         num.add(input[i])
