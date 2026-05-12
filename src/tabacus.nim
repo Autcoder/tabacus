@@ -23,10 +23,11 @@ proc main(): int =
       break
 
     # TODO: Call Lexer
-    var tokens: seq[string] = mathLexer(line)
+    var tokens: seq[Token] = mathLexer(line)
     # TODO: Calculate and return result
     # dispatch commands here
     echo "line → ", line
+    # Print out the tokens
     echo "tokens → ", tokens
     # TODO: print result
     
