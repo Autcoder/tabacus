@@ -2,7 +2,7 @@ import tables
 
 type
   Kind* = enum
-    tkInt, tkFloat, tkPlus, tkMinus, tkTimes, tkDiv, tkLPar, tkRPar,
+    tkInt, tkFloat, tkPlus, tkMinusB, tkMinusU, tkTimes, tkDiv, tkLPar, tkRPar,
     tkFunc, tkConst, tkInvalid
 
   Token* = object
@@ -13,7 +13,7 @@ type
 const Constants: Table[system.string, system.string] = {"pi": "3.14159", "e": "2.71828"}.toTable
 const Functions: array[0..4, string] = ["sin", "cos", "tan", "log", "sqrt"]
 const OpValues: array[0..5, char] = ['+', '-', '*', '/', '(', ')']
-const OpNames: array[0..5, Kind] = [tkPlus, tkMinus, tkTimes, tkDiv, tkLPar, tkRPar]
+const OpNames: array[0..5, Kind] = [tkPlus, tkMinusB, tkTimes, tkDiv, tkLPar, tkRPar]
 
 proc mathLexer*(input: string): seq[Token] =
   var i: int = 0
@@ -48,7 +48,13 @@ proc mathLexer*(input: string): seq[Token] =
 
       # Operators
       of OpValues:
-        result.add(Token(kind: OpNames[OpValues.find(c)], value: $c))
+        # Check if Binary or Unary minus
+        if c == '-':
+          if i < input.len - 1 and input[i+1] in {'0'..'9'}:
+            result.add(Token(kind: tkMinusU, value: $c))
+            inc i
+          else:
+            result.add(Token(kind: OpNames[OpValues.find(c)], value: $c))
         inc i
 
       # Invalid
