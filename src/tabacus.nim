@@ -22,11 +22,15 @@ proc main(): int =
       echo "bye!"
       break
 
-    # TODO: Call Lexer
-    var tokens: seq[string] = mathLexer(line)
+    var tokens: seq[Token]
+    try:
+      tokens = mathLexer(line)
+    except KeyError:
+      echo "invalid input"
     # TODO: Calculate and return result
     # dispatch commands here
     echo "line → ", line
+    # Print out the tokens
     echo "tokens → ", tokens
     # TODO: print result
     
