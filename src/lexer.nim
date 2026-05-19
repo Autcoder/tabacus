@@ -1,19 +1,35 @@
 import tables
+import std/parseutils
 
 type
   Kind* = enum
-    tkInt, tkFloat, tkPlus, tkMinusB, tkMinusU, tkTimes, tkDiv, tkLPar, tkRPar,
-    tkFunc, tkConst, tkInvalid
+    tkFunc, tkConst, tkInvalid, tkMod, tkInt, tkFloat, tkOp
 
   Token* = object
     kind*: Kind
     value*: string
+    num*: float
 
-# A simple map for scaling
-const Constants: Table[system.string, system.string] = {"pi": "3.14159", "e": "2.71828"}.toTable
-const Functions: array[0..4, string] = ["sin", "cos", "tan", "log", "sqrt"]
-const OpValues: array[0..5, char] = ['+', '-', '*', '/', '(', ')']
-const OpNames: array[0..5, Kind] = [tkPlus, tkMinusB, tkTimes, tkDiv, tkLPar, tkRPar]
+let Constants: Table[system.string, system.float] = {
+    "pi": 3.14159, "e": 2.71828, "tau": 6.28318, "phi": 1.61803, "ln2": 0.69315,
+    "ln10": 2.30259, "sqrt3": 1.73205, "sqrt2": 1.41421
+  }.toTable
+
+const Functions: array[0..13, string] = [
+  "sin", "cos", "tan", "log", "sqrt", "abs", "exp", "ln", "ceil", "floor",
+  "round", "asin", "acos", "atan"
+  ]
+
+let OpTable: Table[system.char, system.string] = {
+  '+': "tkPlus",
+  '-': "tkMinus",
+  '*': "tkTimes",
+  '/': "tkDiv",
+  '(': "tkLPar",
+  ')': "tkRPar",
+  '^': "tkPower",
+  '%': "tkMod"
+}.toTable
 
 proc mathLexer*(input: string): seq[Token] =
   var i: int = 0
@@ -27,10 +43,15 @@ proc mathLexer*(input: string): seq[Token] =
       # Numbers
       of '0'..'9':
         var buf: string = ""
+        var numFloat: float
         while i < input.len and input[i] in {'0'..'9', '.'}: # Add decimal support
           buf.add(input[i])
           inc i
-        result.add(Token(kind: if '.' in buf: tkFloat else: tkInt, value: buf))
+        discard parseFloat(buf, numFloat)
+        if buf[0] == '.':
+          result.add(Token(kind: tkFloat, value: buf, num: numFloat))
+        else:
+          result.add(Token(kind: tkInt, value: buf, num: numFloat))
       
       # Constants
       of 'a'..'z', 'A'..'Z':
@@ -40,24 +61,17 @@ proc mathLexer*(input: string): seq[Token] =
           inc i
         
         if buf in Constants:
-          result.add(Token(kind: tkConst, value: Constants[buf]))
+          result.add(Token(kind: tkConst, value: buf, num: Constants[buf]))
         elif buf in Functions:
           result.add(Token(kind: tkFunc, value: buf))
         else:
           result.add(Token(kind: tkInvalid, value: "Unknown word: " & buf))
 
-      # Operators
-      of OpValues:
-        # Check if Binary or Unary minus
-        if c == '-':
-          if i < input.len - 1 and input[i+1] in {'0'..'9'}:
-            result.add(Token(kind: tkMinusU, value: $c))
-            inc i
-          else:
-            result.add(Token(kind: OpNames[OpValues.find(c)], value: $c))
-        inc i
-
-      # Invalid
       else:
-        result.add(Token(kind: tkInvalid, value: $c))
-        inc i
+        
+        if OpTable.hasKey(c):
+          result.add(Token(kind: tkOp, value: OpTable[c]))
+          inc i
+        else:
+          result.add(Token(kind: tkInvalid, value: $c))
+          inc i
