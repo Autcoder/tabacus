@@ -1,5 +1,6 @@
 import system
 import lexer
+import parser
 
 proc main(): int =
   while true:
@@ -23,15 +24,18 @@ proc main(): int =
       break
 
     var tokens: seq[Token]
+    var tkline: seq[Token]
     try:
       tokens = mathLexer(line)
     except KeyError:
       echo "invalid input"
-    # TODO: Calculate and return result
+    tkline = shuntingYard(tokens)
     # dispatch commands here
     echo "line → ", line
     # Print out the tokens
     echo "tokens → ", tokens
+    # Print out the shunting yard output
+    echo "shunting yard → ", tkline
     # TODO: print result
     
 
