@@ -3,37 +3,63 @@ import std/parseutils
 
 type
   Kind* = enum
-    tkFunc, tkConst, tkInvalid, tkMod, tkInt, tkFloat, tkOp, tkLPar, tkRPar
+    tkInvalid,
+
+    tkComma,
+    tkConst,
+    tkDiv,
+    tkFloat,
+    tkFunc,
+    tkInt,
+    tkLPar,
+    tkMinus,
+    tkMod,
+    tkPlus,
+    tkPower,
+    tkRPar,
+    tkTimes,
+    tkUnaryMinus
 
   Token* = object
     kind*: Kind
     value*: string
     num*: float
 
-let Constants: Table[string, float] = {
+let Constants: Table[system.string, system.float64] = {
   "pi": 3.14159,
   "e": 2.71828,
-  "tau": 6.28318,
-  "phi": 1.61803,
-  "ln2": 0.69315,
-  "ln10": 2.30259,
-  "sqrt3": 1.73205,
-  "sqrt2": 1.41421
+  "tau": 6.28318
 }.toTable
 
-const Functions: array[0..13, string] = [
-  "sin", "cos", "tan", "log", "sqrt", "abs", "exp",
-  "ln", "ceil", "floor", "round", "asin", "acos", "atan"
+const Functions = [
+  "sin", "cos", "tan",
+  "sqrt", "ln",
+  "max", "min"
 ]
 
-let OpTable: Table[char, string] = {
-  '+': "tkPlus",
-  '-': "tkMinus",
-  '*': "tkTimes",
-  '/': "tkDiv",
-  '^': "tkPower",
-  '%': "tkMod"
-}.toTable
+proc isValueToken(k: Kind): bool =
+  k in {
+    tkInt, tkFloat, tkConst, tkRPar
+  }
+
+proc makeImplicitMul(
+  result: var seq[Token],
+  nextKind: Kind
+) =
+  if result.len == 0:
+    return
+
+  let prev: Token = result[^1]
+
+  let needsMul: bool =
+    isValueToken(prev.kind) and
+    nextKind in {
+      tkConst, tkFunc, tkLPar,
+      tkInt, tkFloat
+    }
+
+  if needsMul:
+    result.add(Token(kind: tkTimes, value: "*"))
 
 proc mathLexer*(input: string): seq[Token] =
   var i: int = 0
@@ -42,25 +68,29 @@ proc mathLexer*(input: string): seq[Token] =
     let c: char = input[i]
 
     case c
-    # Whitespace
+
     of ' ', '\t':
       inc i
 
-    # Left parenthesis
     of '(':
+      makeImplicitMul(result, tkLPar)
       result.add(Token(kind: tkLPar, value: "("))
       inc i
 
-    # Right parenthesis
     of ')':
       result.add(Token(kind: tkRPar, value: ")"))
       inc i
 
-    # Numbers
+    of ',':
+      result.add(Token(kind: tkComma, value: ","))
+      inc i
+
     of '0'..'9', '.':
+      makeImplicitMul(result, tkFloat)
+
       var buf: string = ""
-      var numFloat: float
       var hasDot: bool = false
+      var numFloat: float
 
       while i < input.len and input[i] in {'0'..'9', '.'}:
         if input[i] == '.':
@@ -73,34 +103,63 @@ proc mathLexer*(input: string): seq[Token] =
 
       discard parseFloat(buf, numFloat)
 
-      if hasDot:
-        result.add(Token(kind: tkFloat, value: buf, num: numFloat))
-      else:
-        result.add(Token(kind: tkInt, value: buf, num: numFloat))
+      result.add(Token(kind: if hasDot: tkFloat else: tkInt, value: buf, num: numFloat))
 
-    # Constants / Functions
     of 'a'..'z', 'A'..'Z':
       var buf: string = ""
 
-      while i < input.len and input[i] in {'a'..'z', 'A'..'Z', '0'..'9'}:
+      while i < input.len and
+            input[i] in {'a'..'z', 'A'..'Z', '0'..'9'}:
         buf.add(input[i])
         inc i
 
       if buf in Constants:
-        result.add(Token(kind: tkConst, value: buf, num: Constants[buf]))
+        makeImplicitMul(result, tkConst)
+        try:
+          result.add(Token(kind: tkConst, value: buf, num: Constants[buf]))
+        except KeyError:
+          result.add(Token(kind: tkInvalid, value: buf))
 
       elif buf in Functions:
+        makeImplicitMul(result, tkFunc)
         result.add(Token(kind: tkFunc, value: buf))
 
       else:
-        result.add(Token(kind: tkInvalid, value: "Unknown word: " & buf))
+        result.add(Token(kind: tkInvalid, value: buf))
 
-    # Operators
     else:
-      if OpTable.hasKey(c):
-        result.add(Token(kind: tkOp, value: OpTable[c]))
-        inc i
+      case c
+      of '+':
+        result.add(Token(kind: tkPlus, value: "+"))
+      of '-':
+        let unary: bool =
+          result.len == 0 or
+          result[^1].kind in {
+            tkPlus,
+            tkMinus,
+            tkTimes,
+            tkDiv,
+            tkPower,
+            tkMod,
+            tkLPar,
+            tkComma
+          }
+
+        result.add(Token(kind: if unary: tkUnaryMinus else: tkMinus, value: "-"))
+
+      of '*':
+        result.add(Token(kind: tkTimes, value: "*"))
+      of '/':
+        result.add(Token(kind: tkDiv, value: "/"))
+      of '^':
+        result.add(Token(kind: tkPower, value: "^"))
+      of '%':
+        result.add(Token(kind: tkMod, value: "%"))
 
       else:
-        result.add(Token(kind: tkInvalid, value: $c))
-        inc i
+        result.add(Token(
+          kind: tkInvalid,
+          value: $c
+        ))
+
+      inc i
