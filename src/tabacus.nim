@@ -1,6 +1,7 @@
 import system
 import lexer
 import parser
+import executor
 
 proc main(): int =
   while true:
@@ -36,7 +37,8 @@ proc main(): int =
     echo "tokens → ", tokens
     # Print out the shunting yard output
     echo "shunting yard → ", tkline
-    # TODO: print result
+    # Evaluate the shunting yard output
+    echo "result → ", evaluateRPN(tkline)
     
 
 when isMainModule:
