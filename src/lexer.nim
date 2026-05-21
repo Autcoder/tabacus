@@ -38,15 +38,9 @@ const Functions = [
   "max", "min"
 ]
 
-proc isValueToken(k: Kind): bool =
-  k in {
-    tkInt, tkFloat, tkConst, tkRPar
-  }
+proc isValueToken(k: Kind): bool = k in {tkInt, tkFloat, tkConst, tkRPar}
 
-proc makeImplicitMul(
-  result: var seq[Token],
-  nextKind: Kind
-) =
+proc makeImplicitMul(result: var seq[Token], nextKind: Kind) =
   if result.len == 0:
     return
 
@@ -54,10 +48,7 @@ proc makeImplicitMul(
 
   let needsMul: bool =
     isValueToken(prev.kind) and
-    nextKind in {
-      tkConst, tkFunc, tkLPar,
-      tkInt, tkFloat
-    }
+    nextKind in {tkConst, tkFunc, tkLPar, tkInt, tkFloat}
 
   if needsMul:
     result.add(Token(kind: tkTimes, value: "*"))
@@ -158,9 +149,6 @@ proc mathLexer*(input: string): seq[Token] =
         result.add(Token(kind: tkMod, value: "%"))
 
       else:
-        result.add(Token(
-          kind: tkInvalid,
-          value: $c
-        ))
+        result.add(Token(kind: tkInvalid, value: $c))
 
       inc i

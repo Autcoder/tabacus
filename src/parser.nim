@@ -13,19 +13,9 @@ proc precedence(k: Kind): int =
   else:
     0
 
-proc isRightAssociative(k: Kind): bool =
-  k in {tkPower, tkUnaryMinus}
+proc isRightAssociative(k: Kind): bool = k in {tkPower, tkUnaryMinus}
 
-proc isOperator(k: Kind): bool =
-  k in {
-    tkPlus,
-    tkMinus,
-    tkUnaryMinus,
-    tkTimes,
-    tkDiv,
-    tkPower,
-    tkMod
-  }
+proc isOperator(k: Kind): bool = k in {tkPlus, tkMinus, tkUnaryMinus, tkTimes, tkDiv, tkPower, tkMod}
 
 proc shuntingYard*(tokens: seq[Token]): seq[Token] =
   var output: seq[Token]
