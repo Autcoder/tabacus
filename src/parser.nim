@@ -70,9 +70,6 @@ proc shuntingYard*(tokens: seq[Token]): seq[Token] =
 
         while stack.len > 0 and isOperator(stack[^1].kind):
           # Unary operators do not pop other unary operators of equal precedence
-          if stack[^1].kind == tkUnaryMinus and token.kind == tkUnaryMinus:
-            break
-            
           if precedence(stack[^1].kind) > precedence(token.kind) or
             (precedence(stack[^1].kind) == precedence(token.kind) and not isRightAssociative(token.kind)):
             output.add(stack.pop())

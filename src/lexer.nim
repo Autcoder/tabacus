@@ -137,6 +137,7 @@ proc mathLexer*(input: string): seq[Token] =
           result[^1].kind in {
             tkPlus,
             tkMinus,
+            tkUnaryMinus,
             tkTimes,
             tkDiv,
             tkPower,

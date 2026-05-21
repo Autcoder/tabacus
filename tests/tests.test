@@ -386,10 +386,10 @@ TEST: Invalid empty parentheses
 RUN:
 ()
 EXPECT_STDOUT:
-The stack has dangling values. Check expression integrity.
+Malformed expression: The stack has dangling values.
 
 TEST: Invalid comma
 RUN:
 2,3
 EXPECT_STDOUT:
-The stack has dangling values. Check expression integrity.
+Malformed expression: The stack has dangling values.

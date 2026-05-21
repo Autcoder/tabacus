@@ -7,23 +7,23 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
   for token in rpnTokens:
     case token.kind
     
-    # 1. Numbers & Constants: Just push their float values
+    # Numbers & Constants: Just push their float values
     of tkInt, tkFloat, tkConst:
       stack.add(token.num)
 
-    # 2. Unary Operators: Pop ONE value, negate it, push it back
+    # Unary Operators: Pop one value, negate it, push it back
     of tkUnaryMinus:
       if stack.len < 1:
         raise newException(ValueError, "Malformed expression: missing value for unary minus")
       let a: float = stack.pop()
       stack.add(-a)
 
-    # 3. Binary Operators: Pop TWO values, evaluate via strong Enum Kinds, push back
+    # Binary Operators: Pop two values, evaluate via Enum Kinds, push back
     of tkPlus, tkMinus, tkTimes, tkDiv, tkPower, tkMod:
       if stack.len < 2:
         raise newException(ValueError, "Malformed expression: missing operands for " & token.value)
       
-      # CRITICAL: The second value popped (b) was the right-side operand!
+      # The second value popped (b) was the right-side operand
       let b: float = stack.pop()
       let a: float = stack.pop()
 
@@ -33,10 +33,10 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
       of tkTimes: stack.add(a * b)
       of tkDiv:   stack.add(a / b)
       of tkPower: stack.add(pow(a, b))
-      of tkMod:   stack.add(a mod b) # Nim uses 'mod' for float/int if math is imported
+      of tkMod:   stack.add(a mod b)
       else: discard
 
-    # 4. Functions: Pop 1 or 2 values depending on the function name string
+    # Functions: Pop 1 or 2 values depending on the function name string
     of tkFunc:
       case token.value
 
@@ -74,7 +74,7 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
 
     else: discard
 
-  # The grand finale
+  # Return the value on the top of the stack
   if stack.len == 1:
     return stack[0]
   else:
