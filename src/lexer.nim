@@ -4,21 +4,20 @@ import math
 
 type
   Kind* = enum
-    tkInvalid,
-
-    tkComma,
-    tkConst,
-    tkDiv,
-    tkFloat,
-    tkFunc,
-    tkInt,
-    tkLPar,
-    tkMinus,
-    tkMod,
-    tkPlus,
-    tkPower,
-    tkRPar,
-    tkTimes,
+    tkInvalid
+    tkComma
+    tkConst
+    tkDiv
+    tkFloat
+    tkFunc
+    tkInt
+    tkLPar
+    tkMinus
+    tkMod
+    tkPlus
+    tkPower
+    tkRPar
+    tkTimes
     tkUnaryMinus
 
   Token* = object
@@ -26,19 +25,13 @@ type
     value*: string
     num*: float
 
-let Constants: Table[system.string, system.float64] = {
-  "pi": PI,
-  "e": E,
-  "tau": TAU
-}.toTable
+let Constants: Table[system.string, system.float64] =
+  {"pi": PI, "e": E, "tau": TAU}.toTable
 
-const Functions = [
-  "sin", "cos", "tan",
-  "sqrt", "ln",
-  "max", "min"
-]
+const Functions = ["sin", "cos", "tan", "sqrt", "ln", "max", "min"]
 
-proc isValueToken(k: Kind): bool = k in {tkInt, tkFloat, tkConst, tkRPar}
+proc isValueToken(k: Kind): bool =
+  k in {tkInt, tkFloat, tkConst, tkRPar}
 
 proc makeImplicitMul(result: var seq[Token], nextKind: Kind) =
   if result.len == 0:
@@ -47,8 +40,7 @@ proc makeImplicitMul(result: var seq[Token], nextKind: Kind) =
   let prev: Token = result[^1]
 
   let needsMul: bool =
-    isValueToken(prev.kind) and
-    nextKind in {tkConst, tkFunc, tkLPar, tkInt, tkFloat}
+    isValueToken(prev.kind) and nextKind in {tkConst, tkFunc, tkLPar, tkInt, tkFloat}
 
   if needsMul:
     result.add(Token(kind: tkTimes, value: "*"))
@@ -60,34 +52,30 @@ proc mathLexer*(input: string): seq[Token] =
     let c: char = input[i]
 
     case c
-
     of ' ', '\t':
       inc i
-
     of '(':
       makeImplicitMul(result, tkLPar)
       result.add(Token(kind: tkLPar, value: "("))
       inc i
-
     of ')':
       result.add(Token(kind: tkRPar, value: ")"))
       inc i
-
     of ',':
       result.add(Token(kind: tkComma, value: ","))
       inc i
-
-    of '0'..'9', '.':
+    of '0' .. '9', '.':
       makeImplicitMul(result, tkFloat)
 
       var buf: string = ""
       var hasDot: bool = false
       var numFloat: float
 
-      while i < input.len and input[i] in {'0'..'9', '.'}:
+      while i < input.len and input[i] in {'0' .. '9', '.'}:
         if input[i] == '.':
           if hasDot:
-            raise newException(KeyError, "Invalid number format: multiple decimal points")
+            raise
+              newException(KeyError, "Invalid number format: multiple decimal points")
           hasDot = true
         buf.add(input[i])
         inc i
@@ -95,12 +83,10 @@ proc mathLexer*(input: string): seq[Token] =
       discard parseFloat(buf, numFloat)
 
       result.add(Token(kind: if hasDot: tkFloat else: tkInt, value: buf, num: numFloat))
-
-    of 'a'..'z', 'A'..'Z':
+    of 'a' .. 'z', 'A' .. 'Z':
       var buf: string = ""
 
-      while i < input.len and
-            input[i] in {'a'..'z', 'A'..'Z', '0'..'9'}:
+      while i < input.len and input[i] in {'a' .. 'z', 'A' .. 'Z', '0' .. '9'}:
         buf.add(input[i])
         inc i
 
@@ -110,14 +96,11 @@ proc mathLexer*(input: string): seq[Token] =
           result.add(Token(kind: tkConst, value: buf, num: Constants[buf]))
         except KeyError:
           result.add(Token(kind: tkInvalid, value: buf))
-
       elif buf in Functions:
         makeImplicitMul(result, tkFunc)
         result.add(Token(kind: tkFunc, value: buf))
-
       else:
         result.add(Token(kind: tkInvalid, value: buf))
-
     else:
       case c
       of '+':
@@ -126,19 +109,11 @@ proc mathLexer*(input: string): seq[Token] =
         let unary: bool =
           result.len == 0 or
           result[^1].kind in {
-            tkPlus,
-            tkMinus,
-            tkUnaryMinus,
-            tkTimes,
-            tkDiv,
-            tkPower,
-            tkMod,
-            tkLPar,
-            tkComma
+            tkPlus, tkMinus, tkUnaryMinus, tkTimes, tkDiv, tkPower, tkMod, tkLPar,
+            tkComma,
           }
 
         result.add(Token(kind: if unary: tkUnaryMinus else: tkMinus, value: "-"))
-
       of '*':
         result.add(Token(kind: tkTimes, value: "*"))
       of '/':
@@ -147,7 +122,6 @@ proc mathLexer*(input: string): seq[Token] =
         result.add(Token(kind: tkPower, value: "^"))
       of '%':
         result.add(Token(kind: tkMod, value: "%"))
-
       else:
         result.add(Token(kind: tkInvalid, value: $c))
 

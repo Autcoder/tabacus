@@ -14,11 +14,11 @@ proc main(): int =
     if stdin.endOfFile():
       # echo "bye!"
       break
-    
+
     try:
       line = readLine(stdin)
     except IOError, EOFError:
-        echo "input error"
+      echo "input error"
 
     if line in ["quit", "exit"]:
       # echo "bye!"
@@ -34,7 +34,6 @@ proc main(): int =
       echo e.msg
     except CatchableError as e:
       echo "Error: ", e.msg
-    
 
 when isMainModule:
   quit(if main() != 0: 1 else: 0)
