@@ -6,6 +6,7 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
 
   for token in rpnTokens:
     case token.kind
+    
     # 1. Numbers & Constants: Just push their float values
     of tkInt, tkFloat, tkConst:
       stack.add(token.num)
@@ -14,51 +15,62 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
     of tkUnaryMinus:
       if stack.len < 1:
         raise newException(ValueError, "Malformed expression: missing value for unary minus")
-      let a = stack.pop()
+      let a: float = stack.pop()
       stack.add(-a)
 
-    # 3. Binary Operators: Pop TWO values, evaluate, push back
+    # 3. Binary Operators: Pop TWO values, evaluate via strong Enum Kinds, push back
     of tkPlus, tkMinus, tkTimes, tkDiv, tkPower, tkMod:
-      # Note: Adjust these 'of' cases to match your exact enum definitions
       if stack.len < 2:
         raise newException(ValueError, "Malformed expression: missing operands for " & token.value)
       
       # CRITICAL: The second value popped (b) was the right-side operand!
-      let b = stack.pop()
-      let a = stack.pop()
+      let b: float = stack.pop()
+      let a: float = stack.pop()
 
-      case token.value # or token.kind depending on your implementation
-      of "+": stack.add(a + b)
-      of "-": stack.add(a - b)
-      of "*": stack.add(a * b)
-      of "/": stack.add(a / b)
-      of "^": stack.add(pow(a, b))
-      of "%": stack.add(a mod b)
+      case token.kind
+      of tkPlus:  stack.add(a + b)
+      of tkMinus: stack.add(a - b)
+      of tkTimes: stack.add(a * b)
+      of tkDiv:   stack.add(a / b)
+      of tkPower: stack.add(pow(a, b))
+      of tkMod:   stack.add(a mod b) # Nim uses 'mod' for float/int if math is imported
       else: discard
 
-    # 4. Functions: Pop 1 or 2 values depending on the function name
+    # 4. Functions: Pop 1 or 2 values depending on the function name string
     of tkFunc:
-      if stack.len < 1:
-        raise newException(ValueError, "Malformed expression: missing arguments for " & token.value)
-
       case token.value
-      # Multi-argument functions (Pop TWO values)
-      of "max", "min":
-        if stack.len < 2: 
-          raise newException(ValueError, "max/min requires 2 arguments")
-        let b = stack.pop()
-        let a = stack.pop()
-        if token.value == "max": stack.add(max(a, b)) else: stack.add(min(a, b))
 
-      # Standard functions (Pop ONE value)
-      of "sin":   stack.add(sin(stack.pop()))
-      of "cos":   stack.add(cos(stack.pop()))
-      of "tan":   stack.add(tan(stack.pop()))
-      of "ln":    stack.add(ln(stack.pop()))
-      of "sqrt":  stack.add(sqrt(stack.pop()))
-      of "abs":   stack.add(abs(stack.pop()))
+      of "max", "min":
+        if stack.len < 2:
+          raise newException(ValueError, token.value & " requires 2 arguments")
+
+        let b: float = stack.pop()
+        let a: float = stack.pop()
+
+        stack.add(
+          if token.value == "max":
+            max(a, b)
+          else:
+            min(a, b)
+        )
+
+      of "sin", "cos", "tan", "ln", "sqrt", "abs":
+        if stack.len < 1:
+          raise newException(ValueError, token.value & " requires 1 argument")
+
+        let a: float = stack.pop()
+
+        case token.value
+        of "sin": stack.add(sin(a))
+        of "cos": stack.add(cos(a))
+        of "tan": stack.add(tan(a))
+        of "ln": stack.add(ln(a))
+        of "sqrt": stack.add(sqrt(a))
+        of "abs": stack.add(abs(a))
+        else: discard
+
       else:
-        raise newException(ValueError, "Unknown function execution: " & token.value)
+        raise newException(ValueError, "Unknown function: " & token.value)
 
     else: discard
 
@@ -66,4 +78,4 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
   if stack.len == 1:
     return stack[0]
   else:
-    raise newException(ValueError, "The stack has dangling values. Check expression integrity.")
+    raise newException(ValueError, "Malformed expression: The stack has dangling values.")

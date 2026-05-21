@@ -1,0 +1,395 @@
+TEST: Basic precedence
+RUN:
+2 + 3 * 4
+EXPECT_STDOUT:
+14.0
+
+TEST: Parentheses precedence
+RUN:
+(2 + 3) * 4
+EXPECT_STDOUT:
+20.0
+
+TEST: Nested parentheses
+RUN:
+((2 + 3) * (4 + 1))
+EXPECT_STDOUT:
+25.0
+
+TEST: Addition
+RUN:
+5 + 7
+EXPECT_STDOUT:
+12.0
+
+TEST: Subtraction
+RUN:
+10 - 3
+EXPECT_STDOUT:
+7.0
+
+TEST: Multiplication
+RUN:
+6 * 7
+EXPECT_STDOUT:
+42.0
+
+TEST: Division
+RUN:
+20 / 5
+EXPECT_STDOUT:
+4.0
+
+TEST: Modulo
+RUN:
+10 % 3
+EXPECT_STDOUT:
+1.0
+
+TEST: Modulo exact
+RUN:
+25 % 5
+EXPECT_STDOUT:
+0.0
+
+TEST: Power
+RUN:
+2 ^ 4
+EXPECT_STDOUT:
+16.0
+
+TEST: Power associativity
+RUN:
+2 ^ 3 ^ 2
+EXPECT_STDOUT:
+512.0
+
+TEST: Unary minus simple
+RUN:
+-5
+EXPECT_STDOUT:
+-5.0
+
+TEST: Unary minus addition
+RUN:
+-5 + 3
+EXPECT_STDOUT:
+-2.0
+
+TEST: Unary minus multiplication
+RUN:
+4 * -2
+EXPECT_STDOUT:
+-8.0
+
+TEST: Unary minus parentheses
+RUN:
+-(2 + 3)
+EXPECT_STDOUT:
+-5.0
+
+TEST: Unary minus precedence
+RUN:
+-2^2
+EXPECT_STDOUT:
+-4.0
+
+TEST: Negative base power
+RUN:
+(-2)^2
+EXPECT_STDOUT:
+4.0
+
+TEST: Double unary minus
+RUN:
+--5
+EXPECT_STDOUT:
+5.0
+
+TEST: Triple unary minus
+RUN:
+---5
+EXPECT_STDOUT:
+-5.0
+
+TEST: Float multiplication
+RUN:
+3.5 * 2
+EXPECT_STDOUT:
+7.0
+
+TEST: Float division
+RUN:
+7.5 / 2.5
+EXPECT_STDOUT:
+3.0
+
+TEST: Float addition
+RUN:
+0.1 + 0.2
+EXPECT_STDOUT:
+0.30000000000000004
+
+TEST: Constant pi
+RUN:
+pi
+EXPECT_STDOUT:
+3.141592653589793
+
+TEST: Constant e
+RUN:
+e
+EXPECT_STDOUT:
+2.718281828459045
+
+TEST: Constant tau
+RUN:
+tau
+EXPECT_STDOUT:
+6.283185307179586
+
+TEST: Pi multiplication
+RUN:
+pi * 2
+EXPECT_STDOUT:
+6.283185307179586
+
+TEST: Tau division
+RUN:
+tau / pi
+EXPECT_STDOUT:
+2.0
+
+TEST: Natural log
+RUN:
+ln(e)
+EXPECT_STDOUT:
+1.0
+
+TEST: Natural log squared
+RUN:
+ln(e^2)
+EXPECT_STDOUT:
+2.0
+
+TEST: Square root
+RUN:
+sqrt(144)
+EXPECT_STDOUT:
+12.0
+
+TEST: Nested square root
+RUN:
+sqrt(sqrt(256))
+EXPECT_STDOUT:
+4.0
+
+TEST: Sin radians
+RUN:
+sin(1)
+EXPECT_STDOUT:
+0.8414709848078965
+
+TEST: Cos radians
+RUN:
+cos(1)
+EXPECT_STDOUT:
+0.5403023058681398
+
+TEST: Tan radians
+RUN:
+tan(1)
+EXPECT_STDOUT:
+1.557407724654902
+
+TEST: Max function
+RUN:
+max(5, 10)
+EXPECT_STDOUT:
+10.0
+
+TEST: Min function
+RUN:
+min(5, 10)
+EXPECT_STDOUT:
+5.0
+
+TEST: Nested max min
+RUN:
+max(min(10, 3), 7)
+EXPECT_STDOUT:
+7.0
+
+TEST: Function nesting
+RUN:
+max(sin(1), cos(1))
+EXPECT_STDOUT:
+0.8414709848078965
+
+TEST: Complex mixed expression
+RUN:
+sqrt(144) + ln(e^2) - min(5, 3) + max(2, 8)
+EXPECT_STDOUT:
+19.0
+
+TEST: Implicit multiplication number paren
+RUN:
+2(3 + 4)
+EXPECT_STDOUT:
+14.0
+
+TEST: Implicit multiplication number constant
+RUN:
+2pi
+EXPECT_STDOUT:
+6.283185307179586
+
+TEST: Implicit multiplication number function
+RUN:
+3sqrt(9)
+EXPECT_STDOUT:
+9.0
+
+TEST: Implicit multiplication paren paren
+RUN:
+(2 + 1)(3 + 1)
+EXPECT_STDOUT:
+12.0
+
+TEST: Implicit multiplication constant paren
+RUN:
+pi(2)
+EXPECT_STDOUT:
+6.283185307179586
+
+TEST: Deep nesting
+RUN:
+((((2 + 3))))
+EXPECT_STDOUT:
+5.0
+
+TEST: Large expression
+RUN:
+(2 + 3 * 4 - 5 / 2 + sqrt(81)) * 2
+EXPECT_STDOUT:
+41.0
+
+TEST: Whitespace handling
+RUN:
+   2    +   3   *   4
+EXPECT_STDOUT:
+14.0
+
+TEST: Unary minus inside function
+RUN:
+sqrt(-(-9))
+EXPECT_STDOUT:
+3.0
+
+TEST: Chained powers
+RUN:
+2^2^3
+EXPECT_STDOUT:
+256.0
+
+TEST: Zero power
+RUN:
+5^0
+EXPECT_STDOUT:
+1.0
+
+TEST: Zero multiplication
+RUN:
+0 * 999
+EXPECT_STDOUT:
+0.0
+
+TEST: Division by float
+RUN:
+1 / 4
+EXPECT_STDOUT:
+0.25
+
+TEST: Nested unary
+RUN:
+-(-(-2))
+EXPECT_STDOUT:
+-2.0
+
+TEST: Complex implicit multiplication
+RUN:
+2pi + 3(4)
+EXPECT_STDOUT:
+18.283185307179586
+
+TEST: Invalid mismatched left paren
+RUN:
+(2 + 3
+EXPECT_STDOUT:
+Mismatched parentheses
+
+TEST: Invalid mismatched right paren
+RUN:
+2 + 3)
+EXPECT_STDOUT:
+Mismatched parentheses: unexpected closing parenthesis
+
+TEST: Invalid operator chain
+RUN:
+2 + * 3
+EXPECT_STDOUT:
+Malformed expression: missing operands for +
+
+TEST: Invalid double power
+RUN:
+^^
+EXPECT_STDOUT:
+Malformed expression: missing operands for ^
+
+TEST: Invalid empty function
+RUN:
+sin()
+EXPECT_STDOUT:
+sin requires 1 argument
+
+TEST: Invalid empty max
+RUN:
+max(,)
+EXPECT_STDOUT:
+max requires 2 arguments
+
+TEST: Invalid identifier
+RUN:
+banana(5)
+EXPECT_STDOUT:
+Invalid token: banana
+
+TEST: Invalid float
+RUN:
+1.2.3
+EXPECT_STDOUT:
+Invalid number format: multiple decimal points
+
+TEST: Invalid trailing operator
+RUN:
+5 +
+EXPECT_STDOUT:
+Malformed expression: missing operands for +
+
+TEST: Invalid leading operator
+RUN:
+* 5
+EXPECT_STDOUT:
+Malformed expression: missing operands for *
+
+TEST: Invalid empty parentheses
+RUN:
+()
+EXPECT_STDOUT:
+The stack has dangling values. Check expression integrity.
+
+TEST: Invalid comma
+RUN:
+2,3
+EXPECT_STDOUT:
+The stack has dangling values. Check expression integrity.

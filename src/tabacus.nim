@@ -12,7 +12,7 @@ proc main(): int =
       echo "repl error occured"
     stdout.flushFile()
     if stdin.endOfFile():
-      echo "bye!"
+      # echo "bye!"
       break
     
     try:
@@ -21,24 +21,19 @@ proc main(): int =
         echo "input error"
 
     if line in ["quit", "exit"]:
-      echo "bye!"
+      # echo "bye!"
       break
 
-    var tokens: seq[Token]
-    var tkline: seq[Token]
     try:
-      tokens = mathLexer(line)
-    except KeyError:
-      echo "invalid input"
-    tkline = shuntingYard(tokens)
-    # dispatch commands here
-    echo "line → ", line
-    # Print out the tokens
-    echo "tokens → ", tokens
-    # Print out the shunting yard output
-    echo "shunting yard → ", tkline
-    # Evaluate the shunting yard output
-    echo "result → ", evaluateRPN(tkline)
+      let tokens: seq[Token] = mathLexer(line)
+      let tkline: seq[Token] = shuntingYard(tokens)
+      echo evaluateRPN(tkline)
+    except KeyError as e:
+      echo e.msg
+    except ValueError as e:
+      echo e.msg
+    except CatchableError as e:
+      echo "Error: ", e.msg
     
 
 when isMainModule:

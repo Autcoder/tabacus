@@ -35,6 +35,8 @@ proc shuntingYard*(tokens: seq[Token]): seq[Token] =
 
     case token.kind
 
+    of tkInvalid:
+      raise newException(ValueError, "Invalid token: " & token.value)
     of tkInt, tkFloat, tkConst:
       output.add(token)
 
@@ -49,26 +51,42 @@ proc shuntingYard*(tokens: seq[Token]): seq[Token] =
       stack.add(token)
 
     of tkRPar:
-      while stack.len > 0 and stack[^1].kind != tkLPar:
+      var foundLeftParen: bool = false
+      while stack.len > 0:
+        if stack[^1].kind == tkLPar:
+          foundLeftParen = true
+          break
         output.add(stack.pop())
-      if stack.len > 0:
-        discard stack.pop()
+      
+      if not foundLeftParen:
+        raise newException(ValueError, "Mismatched parentheses: unexpected closing parenthesis")
+      
+      discard stack.pop() # Safely discard the tkLPar
       if stack.len > 0 and stack[^1].kind == tkFunc:
         output.add(stack.pop())
 
     else:
       if isOperator(token.kind):
 
-        while stack.len > 0 and
-          isOperator(stack[^1].kind) and
-          (precedence(stack[^1].kind) > precedence(token.kind) or
-          (precedence(stack[^1].kind) == precedence(token.kind) and not
-          isRightAssociative(token.kind))):
+        while stack.len > 0 and isOperator(stack[^1].kind):
+          # Unary operators do not pop other unary operators of equal precedence
+          if stack[^1].kind == tkUnaryMinus and token.kind == tkUnaryMinus:
+            break
+            
+          if precedence(stack[^1].kind) > precedence(token.kind) or
+            (precedence(stack[^1].kind) == precedence(token.kind) and not isRightAssociative(token.kind)):
             output.add(stack.pop())
+          else:
+            break
 
         stack.add(token)
 
   while stack.len > 0:
-    output.add(stack.pop())
+    let top: Token = stack.pop()
+
+    if top.kind in {tkLPar, tkRPar}:
+      raise newException(ValueError, "Mismatched parentheses")
+
+    output.add(top)
 
   return output

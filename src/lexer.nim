@@ -1,5 +1,6 @@
 import tables
 import std/parseutils
+import math
 
 type
   Kind* = enum
@@ -26,9 +27,9 @@ type
     num*: float
 
 let Constants: Table[system.string, system.float64] = {
-  "pi": 3.14159,
-  "e": 2.71828,
-  "tau": 6.28318
+  "pi": PI,
+  "e": E,
+  "tau": TAU
 }.toTable
 
 const Functions = [
@@ -95,9 +96,8 @@ proc mathLexer*(input: string): seq[Token] =
       while i < input.len and input[i] in {'0'..'9', '.'}:
         if input[i] == '.':
           if hasDot:
-            break
+            raise newException(KeyError, "Invalid number format: multiple decimal points")
           hasDot = true
-
         buf.add(input[i])
         inc i
 
