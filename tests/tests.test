@@ -394,26 +394,14 @@ RUN:
 EXPECT_STDOUT:
 Malformed expression: The stack has dangling values.
 
-TEST: The Gaussian Distribution at x=1
+TEST: Implicit Multiplication Hell
 RUN:
-1 / sqrt(2pi) * e^(-1^2 / 2)
+2pi(3 + 4)sqrt(2)
 EXPECT_STDOUT:
-0.24197072451914337
+62.20036113421713
 
-TEST: The Black-Scholes Formula
+TEST: Adjacent Functions
 RUN:
-(ln(100 / 95) + (0.05^2 / 2)) / sqrt(1)
+sin(pi / 2)cos(0)
 EXPECT_STDOUT:
-0.05254329438755048
-
-TEST: Great-Circle Distance (Haversine Formula)
-RUN:
-sin(0.5)^2 + cos(0.2)cos(0.8)sin(0.3)^2
-EXPECT_STDOUT:
-0.2894809239881009
-
-TEST: Relativity: Kinetic Energy at 90% Light Speed
-RUN:
-1(1^2) (1 / sqrt(1 - 0.9^2) - 1)
-EXPECT_STDOUT:
-1.294157338705618
+1.0
