@@ -404,7 +404,7 @@ TEST: The Black-Scholes Formula
 RUN:
 (ln(100 / 95) + (0.05^2 / 2)) / sqrt(1)
 EXPECT_STDOUT:
-0.05254322421715011
+0.05254329438755048
 
 TEST: Great-Circle Distance (Haversine Formula)
 RUN:
