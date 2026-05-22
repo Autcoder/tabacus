@@ -138,7 +138,7 @@ EXPECT_STDOUT:
 
 TEST: Constant e
 RUN:
-e
+euler
 EXPECT_STDOUT:
 2.718281828459045
 
@@ -162,13 +162,13 @@ EXPECT_STDOUT:
 
 TEST: Natural log
 RUN:
-ln(e)
+ln(euler)
 EXPECT_STDOUT:
 1.0
 
 TEST: Natural log squared
 RUN:
-ln(e^2)
+ln(euler^2)
 EXPECT_STDOUT:
 2.0
 
@@ -228,7 +228,7 @@ EXPECT_STDOUT:
 
 TEST: Complex mixed expression
 RUN:
-sqrt(144) + ln(e^2) - min(5, 3) + max(2, 8)
+sqrt(144) + ln(euler^2) - min(5, 3) + max(2, 8)
 EXPECT_STDOUT:
 19.0
 
@@ -350,7 +350,7 @@ TEST: Invalid empty function
 RUN:
 sin()
 EXPECT_STDOUT:
-sin requires 1 argument
+sin requires an argument
 
 TEST: Invalid empty max
 RUN:

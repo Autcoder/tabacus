@@ -1,6 +1,7 @@
 import tables
-import std/parseutils
-import math
+import parseutils
+import funcs
+import constantsTable
 
 type
   Kind* = enum
@@ -24,11 +25,6 @@ type
     kind*: Kind
     value*: string
     num*: float
-
-let Constants: Table[system.string, system.float64] =
-  {"pi": PI, "e": E, "tau": TAU}.toTable
-
-const Functions = ["sin", "cos", "tan", "sqrt", "ln", "max", "min"]
 
 proc isValueToken(k: Kind): bool =
   k in {tkInt, tkFloat, tkConst, tkRPar}
@@ -86,7 +82,7 @@ proc mathLexer*(input: string): seq[Token] =
     of 'a' .. 'z', 'A' .. 'Z':
       var buf: string = ""
 
-      while i < input.len and input[i] in {'a' .. 'z', 'A' .. 'Z', '0' .. '9'}:
+      while i < input.len and input[i] in {'a' .. 'z', 'A' .. 'Z', '0' .. '9', '_'}:
         buf.add(input[i])
         inc i
 
@@ -96,7 +92,7 @@ proc mathLexer*(input: string): seq[Token] =
           result.add(Token(kind: tkConst, value: buf, num: Constants[buf]))
         except KeyError:
           result.add(Token(kind: tkInvalid, value: buf))
-      elif buf in Functions:
+      elif buf in OneArgFuncs or buf in TwoArgFuncs:
         makeImplicitMul(result, tkFunc)
         result.add(Token(kind: tkFunc, value: buf))
       else:

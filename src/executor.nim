@@ -1,5 +1,7 @@
 import math
 import lexer
+import tables
+import funcs
 
 proc evaluateRPN*(rpnTokens: seq[Token]): float =
   var stack: seq[float] = @[]
@@ -49,43 +51,28 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
 
     # Functions: Pop 1 or 2 values depending on the function name string
     of tkFunc:
-      case token.value
-      of "max", "min":
+      if token.value in TwoArgFuncs:
         if stack.len < 2:
           raise newException(ValueError, token.value & " requires 2 arguments")
 
         let b: float = stack.pop()
         let a: float = stack.pop()
-
-        stack.add(
-          if token.value == "max":
-            max(a, b)
-          else:
-            min(a, b)
-        )
-      of "sin", "cos", "tan", "ln", "sqrt", "abs":
+        var nativeFunc: TwoArgMathFunc
+        try:
+          nativeFunc = TwoArgFuncs[token.value]
+        except KeyError:
+          raise newException(ValueError, "Unknown function: " & token.value)
+        stack.add(nativeFunc(a, b))
+      elif token.value in OneArgFuncs:
         if stack.len < 1:
-          raise newException(ValueError, token.value & " requires 1 argument")
-
-        let a: float = stack.pop()
-
-        case token.value
-        of "sin":
-          stack.add(sin(a))
-        of "cos":
-          stack.add(cos(a))
-        of "tan":
-          stack.add(tan(a))
-        of "ln":
-          stack.add(ln(a))
-        of "sqrt":
-          stack.add(sqrt(a))
-        of "abs":
-          stack.add(abs(a))
-        else:
-          discard
-      else:
-        raise newException(ValueError, "Unknown function: " & token.value)
+          raise newException(ValueError, token.value & " requires an argument")
+        let arg: float = stack.pop()
+        var nativeFunc: OneArgMathFunc
+        try:
+          nativeFunc = OneArgFuncs[token.value]
+        except KeyError:
+          raise newException(ValueError, "Unknown function: " & token.value)
+        stack.add(nativeFunc(arg))
     else:
       discard
 

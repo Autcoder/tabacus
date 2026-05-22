@@ -1,7 +1,7 @@
 
 TEST: The Gaussian Distribution at x=1
 RUN:
-1 / sqrt(2pi) * e^(-1^2 / 2)
+1 / sqrt(2pi) * euler^(-1^2 / 2)
 EXPECT_STDOUT:
 0.24197072451914337
 
@@ -55,7 +55,7 @@ EXPECT_STDOUT:
 
 TEST: Damped Oscillation
 RUN:
-e^(-0.5)cos(2pi)
+euler^(-0.5)cos(2pi)
 EXPECT_STDOUT:
 0.6065306597126334
 
@@ -67,6 +67,6 @@ EXPECT_STDOUT:
 
 TEST: Continuous Compound Interest
 RUN:
-100e^(0.05 * 10)
+100euler^(0.05 * 10)
 EXPECT_STDOUT:
 164.87212707001282
