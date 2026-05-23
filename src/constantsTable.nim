@@ -1,5 +1,7 @@
-# Credits to https://github.com/SciNim/nim-constants for most of the constants
-import std/[tables, macros, strutils]
+# Credits to https://github.com/SciNim/nim-constants for 162 of the constants
+import tables
+import macros
+import strutils
 
 const
   accelerationOfGravity*: float64 = 9.80665
@@ -29,6 +31,7 @@ const
   catalan*: float64 = 0.91596559417721901505460351
   champernowne*: float64 = 0.12345678910111213141
   chebyshev*: float64 = 0.59017029950804811302
+  conicSchwarzschild*: float64 = 7.38905609893065022723
   connective*: float64 = 1.84775906502257351225
   conway*: float64 = 1.30357726903429639125709911
   copelandErdos*: float64 = 0.23571113171923293137
@@ -81,6 +84,7 @@ const
   heathBrownMoroz*: float64 = 0.00131764115485317810
   hermite*: float64 = 0.74048048969306104116
   hyperbolicTangent*: float64 = 0.76159415595576488811
+  inversePi*: float64 = 0.31830988618379067153
   ioachimescu*: float64 = 0.53964549119041318711
   josephson*: float64 = 483597.898e9
   jupiterEquatorialRadius*: float64 = 71492000.0
@@ -96,6 +100,7 @@ const
   landauRamanujan*: float64 = 0.76422365358922066299069873
   laplaceLimit*: float64 = 0.66274341934918158097474209
   lebesgue*: float64 = 1.43599112417691743235
+  lebesqueLTwo*: float64 = 1.64218843522212113687
   lemniscate*: float64 = 2.62205755429211981046
   levy*: float64 = 3.27582291872181115978768188
   liebsSquareIce*: float64 = 1.5396007178
@@ -108,6 +113,8 @@ const
   masserGramain*: float64 = 6.58088599101792097085
   meisselMertens*: float64 = 0.26149721284764278375542683
   mill*: float64 = 1.30637788386308069046861449
+  minXPowX*: float64 = 0.69220062755534635386
+  mKB*: float64 = 0.07077603931152880353
   mRB*: float64 = 0.18785964246206712024
   murata*: float64 = 2.82641999706759157554
   neutronMass*: float64 = 1.67492747e-27
@@ -146,6 +153,7 @@ const
   solarLuminosity*: float64 = 3.828e+26
   somosQuadraticRecurrence*: float64 = 1.66168794963359412129
   sophomoreDream*: float64 = 0.78343051071213440705
+  sophomoreDreamLTwo*: float64 = 1.29128599706266354040
   speedOfLight*: float64 = 299792458.0
   spiralOfTheodorus*: float64 = 1.86002507922119030718
   stefanBoltzmann*: float64 = 5.670367e-08
@@ -194,29 +202,29 @@ let Constants*: Table[string, float64] = autoPopulateConstants(
   astronomicalUnit, atomicMass, backhouse, baker, baxterFourColoring, bernstein,
   blochLandau, bohrMagneton, bohrRadius, boisReymond, bolometricLuminosity, boltzmann,
   bronzeRatio, brun, buffon, cahen, calabiTriangle, carefree, carlsonLevin, catalan,
-  champernowne, chebyshev, connective, conway, copelandErdos, cubicRecurrence, delian,
-  deVicciTesseract, dottie, doubleFactorial, earthEquatorialRadius, earthMass,
-  earthsRotationalPeriod, electronCharge, electronMass, embreeTrefethen, erdosBorwein,
-  euler, eulerGompertz, eulerMascheroni, eulerTotient, faraday, favard,
-  feigenbaumBifurcationVelocity, feigenbaumReductionParameter, fellerTornier,
-  fibonacciFactorial, fineStructure, flajoletRichmond, foiasAlpha, foiasBeta,
-  fransenRobinson, gas, gauss, gaussianGravitational, gaussKuzminWirsing,
-  gaussLemniscate, gelfond, gelfondSchneider, gibbs, gieseking, glaisherKinkelin,
-  gohSchmutz, goldenAngle, goldenRatio, goldenSpiral, golombDickman, gravitational,
-  grothendieck, hafnerSarnakMcCurley, hallMontgomery, heathBrownMoroz, hermite,
-  hyperbolicTangent, ioachimescu, josephson, jupiterEquatorialRadius, jupiterMass,
-  kasner, kempnerReihe, keplerBouwkamp, khinchin, khinchinLevy, kiloparsec,
-  kneserMahler, komornikLoreti, landauRamanujan, laplaceLimit, lebesgue, lemniscate,
-  levy, liebsSquareIce, liouville, loch, luroth, madelung, magicAngle,
-  magneticVacuumPermeability, masserGramain, meisselMertens, mill, mRB, murata,
-  neutronMass, nielsenRamanujan, niven, omega, orbitalPeriodOfEarth, paris, parsec,
-  pell, pi, piSquared, planck, plastic, plouffe, plouffeGamma, polya, porter,
-  protonMass, prouhetThueMorse, pythagoras, raabe, ramanujanSoldner,
-  reciprocalFibonacci, reducedPlanck, renyiParking, reuleauxTriangle, riemannZeta,
-  robbins, rutgers, rydberg, sarnak, sierpinski, silverman, smarandache,
-  solarLuminosity, somosQuadraticRecurrence, sophomoreDream, speedOfLight,
-  spiralOfTheodorus, stefanBoltzmann, steiner, stephens, stronglyCarefree,
-  sunEquatorialRadius, sunMass, taniguchi, tau, theodorus,
+  champernowne, chebyshev, conicSchwarzschild, connective, conway, copelandErdos,
+  cubicRecurrence, delian, deVicciTesseract, dottie, doubleFactorial,
+  earthEquatorialRadius, earthMass, earthsRotationalPeriod, electronCharge,
+  electronMass, embreeTrefethen, erdosBorwein, euler, eulerGompertz, eulerMascheroni,
+  eulerTotient, faraday, favard, feigenbaumBifurcationVelocity,
+  feigenbaumReductionParameter, fellerTornier, fibonacciFactorial, fineStructure,
+  flajoletRichmond, foiasAlpha, foiasBeta, fransenRobinson, gas, gauss,
+  gaussianGravitational, gaussKuzminWirsing, gaussLemniscate, gelfond, gelfondSchneider,
+  gibbs, gieseking, glaisherKinkelin, gohSchmutz, goldenAngle, goldenRatio,
+  goldenSpiral, golombDickman, gravitational, grothendieck, hafnerSarnakMcCurley,
+  hallMontgomery, heathBrownMoroz, hermite, hyperbolicTangent, inversePi, ioachimescu,
+  josephson, jupiterEquatorialRadius, jupiterMass, kasner, kempnerReihe, keplerBouwkamp,
+  khinchin, khinchinLevy, kiloparsec, kneserMahler, komornikLoreti, landauRamanujan,
+  laplaceLimit, lebesgue, lebesqueLTwo, lemniscate, levy, liebsSquareIce, liouville,
+  loch, luroth, madelung, magicAngle, magneticVacuumPermeability, masserGramain,
+  meisselMertens, mill, minXPowX, mKB, mRB, murata, neutronMass, nielsenRamanujan,
+  niven, omega, orbitalPeriodOfEarth, paris, parsec, pell, pi, piSquared, planck,
+  plastic, plouffe, plouffeGamma, polya, porter, protonMass, prouhetThueMorse,
+  pythagoras, raabe, ramanujanSoldner, reciprocalFibonacci, reducedPlanck, renyiParking,
+  reuleauxTriangle, riemannZeta, robbins, rutgers, rydberg, sarnak, sierpinski,
+  silverman, smarandache, solarLuminosity, somosQuadraticRecurrence, sophomoreDream,
+  sophomoreDreamLTwo, speedOfLight, spiralOfTheodorus, stefanBoltzmann, steiner,
+  stephens, stronglyCarefree, sunEquatorialRadius, sunMass, taniguchi, tau, theodorus,
   thomsonScatteringCrossSection, tribonacci, trott, tutteBeraha, twinPrime,
   universalParabolic, vacuumElectricPermittivity, vanDerPauw, vardi, viswanath,
   volumeOfReuleauxTetrahedron, wallis, weierstrass, wienWavelengthDisplacementLaw,
