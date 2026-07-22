@@ -1,0 +1,37 @@
+TEST: Basic variable assignment and usage
+RUN:
+x = 10
+y = 20
+x + y
+EXPECT_STDOUT:
+x = 10.0
+y = 20.0
+30.0
+
+TEST: Variable re-use in complex expressions
+RUN:
+radius = 5
+pi * radius^2
+EXPECT_STDOUT:
+radius = 5.0
+78.53981633974483
+
+TEST: Built-in 'ans' chaining
+RUN:
+10 + 5
+ans * 2
+ans + 5
+EXPECT_STDOUT:
+15.0
+30.0
+35.0
+
+TEST: Implicit multiplication with variables
+RUN:
+a = 4
+b = 5
+2a + 3b
+EXPECT_STDOUT:
+a = 4.0
+b = 5.0
+23.0

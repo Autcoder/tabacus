@@ -1,0 +1,119 @@
+TEST: Combination nCr
+RUN:
+nCr(5, 2)
+EXPECT_STDOUT:
+10.0
+
+TEST: Factorial alias fact
+RUN:
+fac(5)
+EXPECT_STDOUT:
+120.0
+
+TEST: Factorial alias factorial
+RUN:
+factorial(4)
+EXPECT_STDOUT:
+24.0
+
+TEST: Greatest Common Divisor
+RUN:
+gcd(54, 24)
+EXPECT_STDOUT:
+6.0
+
+TEST: Least Common Multiple
+RUN:
+lcm(12, 18)
+EXPECT_STDOUT:
+36.0
+
+TEST: Bitwise AND
+RUN:
+and(12, 10)
+EXPECT_STDOUT:
+8.0
+
+TEST: Bitwise OR
+RUN:
+or(12, 10)
+EXPECT_STDOUT:
+14.0
+
+TEST: Bitwise XOR
+RUN:
+xor(12, 10)
+EXPECT_STDOUT:
+6.0
+
+TEST: Bitwise Shift Left
+RUN:
+shl(1, 4)
+EXPECT_STDOUT:
+16.0
+
+TEST: Bitwise Shift Right
+RUN:
+shr(16, 2)
+EXPECT_STDOUT:
+4.0
+
+TEST: Inverse Sine (asin and arcsin)
+RUN:
+asin(1)
+arcsin(1)
+EXPECT_STDOUT:
+1.5707963267948966
+1.5707963267948966
+
+TEST: Inverse Cosine (acos and arccos)
+RUN:
+acos(1)
+arccos(1)
+EXPECT_STDOUT:
+0.0
+0.0
+
+TEST: Inverse Tangent (atan and arctan)
+RUN:
+atan(1)
+arctan(1)
+EXPECT_STDOUT:
+0.7853981633974483
+0.7853981633974483
+
+TEST: Angle Unit Conversion rad2deg
+RUN:
+rad2deg(pi)
+EXPECT_STDOUT:
+180.0
+
+TEST: Angle Unit Conversion deg2rad
+RUN:
+deg2rad(180)
+EXPECT_STDOUT:
+3.141592653589793
+
+TEST: Rounding and Truncation
+RUN:
+round(3.7)
+trunc(3.7)
+sgn(-42)
+EXPECT_STDOUT:
+4.0
+3.0
+-1.0
+
+TEST: Normalized Sinc Function
+RUN:
+sinc(0)
+sinc(0.5)
+EXPECT_STDOUT:
+1.0
+0.6366197723675814
+
+TEST: Error Function erf
+RUN:
+erf(1)
+EXPECT_STDOUT:
+0.8427007929497148

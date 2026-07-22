@@ -1,0 +1,71 @@
+TEST: Invalid mismatched left paren
+RUN:
+(2 + 3
+EXPECT_STDOUT:
+Error: Mismatched parentheses
+
+TEST: Invalid mismatched right paren
+RUN:
+2 + 3)
+EXPECT_STDOUT:
+Error: Mismatched parentheses: unexpected closing parenthesis
+
+TEST: Invalid operator chain
+RUN:
+2 + * 3
+EXPECT_STDOUT:
+Error: Malformed expression: missing operands for +
+
+TEST: Invalid double power
+RUN:
+^^
+EXPECT_STDOUT:
+Error: Malformed expression: missing operands for ^
+
+TEST: Invalid empty function
+RUN:
+sin()
+EXPECT_STDOUT:
+Error: sin requires an argument
+
+TEST: Invalid empty max
+RUN:
+max(,)
+EXPECT_STDOUT:
+Error: max requires 2 arguments
+
+TEST: Invalid identifier
+RUN:
+banana(5)
+EXPECT_STDOUT:
+Error: Undefined variable: banana
+
+TEST: Invalid float
+RUN:
+1.2.3
+EXPECT_STDOUT:
+Error: Invalid number format: multiple decimal points
+
+TEST: Invalid trailing operator
+RUN:
+5 +
+EXPECT_STDOUT:
+Error: Malformed expression: missing operands for +
+
+TEST: Invalid leading operator
+RUN:
+* 5
+EXPECT_STDOUT:
+Error: Malformed expression: missing operands for *
+
+TEST: Invalid empty parentheses
+RUN:
+()
+EXPECT_STDOUT:
+Error: Malformed expression: The stack has dangling values.
+
+TEST: Invalid comma
+RUN:
+2,3
+EXPECT_STDOUT:
+Error: Malformed expression: The stack has dangling values.

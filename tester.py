@@ -48,8 +48,12 @@ def clean_output(text):
     cleaned = []
 
     for line in lines:
-        line = line.replace("input> ", "")
-        line = line.replace("input>", "")
+        # Strip noise prompt prefixes
+        line = line.replace("input> ", "").replace("input>", "")
+        
+        # Ignore EOF error message emitted on pipe closure
+        if line.strip() == "Error: EOF reached":
+            continue
 
         if line.strip():
             cleaned.append(line)

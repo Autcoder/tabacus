@@ -65,6 +65,7 @@ proc mathLexer*(input: string): seq[Token] =
       inc i
     of '=':
       result.add(Token(kind: tkAssign, value: "="))
+      inc i # <--- Fixed: consume '='
     of '0' .. '9', '.':
       makeImplicitMul(result, tkFloat)
 
@@ -72,6 +73,7 @@ proc mathLexer*(input: string): seq[Token] =
       var hasDot: bool = false
       var numFloat: float
 
+      # 1. Collect standard digits and dot
       while i < input.len and input[i] in {'0' .. '9', '.'}:
         if input[i] == '.':
           if hasDot:
@@ -81,9 +83,39 @@ proc mathLexer*(input: string): seq[Token] =
         buf.add(input[i])
         inc i
 
+      # 2. Support scientific notation (e.g. 1e10, 6.674e-11, 3E8)
+      if i < input.len and input[i] in {'e', 'E'}:
+        # Only treat as exponent if followed by digits or a +/- sign and digits
+        let nextChar =
+          if i + 1 < input.len:
+            input[i + 1]
+          else:
+            ' '
+        let isExponent =
+          nextChar in {'0' .. '9'} or (
+            (nextChar == '+' or nextChar == '-') and i + 2 < input.len and
+            input[i + 2] in {'0' .. '9'}
+          )
+
+        if isExponent:
+          buf.add(input[i]) # add 'e' or 'E'
+          inc i
+          if i < input.len and input[i] in {'+', '-'}:
+            buf.add(input[i]) # add '+' or '-'
+            inc i
+          while i < input.len and input[i] in {'0' .. '9'}:
+            buf.add(input[i])
+            inc i
+
       discard parseFloat(buf, numFloat)
 
-      result.add(Token(kind: if hasDot: tkFloat else: tkInt, value: buf, num: numFloat))
+      result.add(
+        Token(
+          kind: if hasDot or 'e' in buf or 'E' in buf: tkFloat else: tkInt,
+          value: buf,
+          num: numFloat,
+        )
+      )
     of 'a' .. 'z', 'A' .. 'Z':
       var buf: string = ""
 

@@ -79,6 +79,10 @@ const OneArgFuncs*: Table[string, OneArgMathFunc] = {
     proc(x: float): float =
       math.fac(x.int).float
   ),
+  "factorial": f1(
+    proc(x: float): float =
+      math.fac(x.int).float
+  ),
   "sinc": f1(
     proc(x: float): float =
       (if x == 0.0: 1.0 else: math.sin(math.PI * x) / (math.PI * x))

@@ -26,6 +26,8 @@ proc main(): int =
     except IOError as e:
       echo "Error: ", e.msg
       break
+    except EOFError:
+      break
     except Exception as e:
       echo "Error: ", e.msg
 
