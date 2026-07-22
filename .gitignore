@@ -2,3 +2,7 @@ nimcache/
 nimblecache/
 htmldocs/
 tabacus
+nimble.develop
+nimble.paths
+nimbledeps
+nim_out.sh

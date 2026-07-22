@@ -1,41 +1,37 @@
 import system
-import lexer
-import parser
-import executor
+import noise
+import lexer, parser, executor
 
-proc main(): int =
+proc main() =
+  # 1. Initialize the Noise instance
+  var n = Noise.init()
+
+  # 2. Configure history on the instance
+  n.historySetMaxLen(100)
+  n.setPrompt("input> ")
+
   while true:
-    var line: string
-    try:
-      stdout.write("input> ")
-    except IOError, EOFError:
-      echo "repl error occured"
-    stdout.flushFile()
-    if stdin.endOfFile():
-      # echo "bye!"
+    # 3. readLine returns false on EOF / Ctrl+D
+    let ok = n.readLine()
+    if not ok:
       break
 
-    try:
-      line = readLine(stdin)
-    except IOError, EOFError:
-      echo "input error"
+    let inputStr = n.getLine()
 
-    if line in ["quit", "exit"]:
-      # echo "bye!"
+    if inputStr in ["quit", "exit"]:
       break
 
-    try:
-      let tokens: seq[Token] = mathLexer(line)
-      let tkline: seq[Token] = shuntingYard(tokens)
-      echo evaluateRPN(tkline)
-    except KeyError as e:
-      echo e.msg
-    except ValueError as e:
-      echo e.msg
-    except CatchableError as e:
-      echo "Error: ", e.msg
-    except Exception as e:
-      echo "Error: ", e.msg
+    if inputStr.len > 0:
+      # Add to history
+      n.historyAdd(inputStr)
+
+      try:
+        let tokens = mathLexer(inputStr)
+        let rpn = shuntingYard(tokens)
+        let val = evaluateRPN(rpn)
+        echo val
+      except CatchableError as e:
+        echo "Error: ", e.msg
 
 when isMainModule:
-  quit(if main() != 0: 1 else: 0)
+  main()

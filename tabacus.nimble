@@ -11,3 +11,4 @@ bin           = @["tabacus"]
 # Dependencies
 
 requires "nim >= 2.2.6"
+requires "noise"
