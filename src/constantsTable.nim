@@ -183,19 +183,26 @@ const
 
 macro autoPopulateConstants(symbols: varargs[untyped]): untyped =
   result = newNimNode(nnkTableConstr)
+
   for sym in symbols:
-    let rawName: string = sym.toStrLit.strVal
-    var cleanName: string = ""
+    let camelName: string = sym.toStrLit.strVal # e.g. "accelerationOfGravity"
+    var snakeName: string = "" # e.g. "acceleration_of_gravity"
 
-    for i, c in rawName:
+    for c in camelName:
       if c.isUpperAscii:
-        cleanName.add('_')
-        cleanName.add(c.toLowerAscii)
+        snakeName.add('_')
+        snakeName.add(c.toLowerAscii)
       else:
-        cleanName.add(c)
+        snakeName.add(c)
 
-    let key: NimNode = newLit(cleanName)
-    result.add newTree(nnkExprColonExpr, key, sym)
+    # 1. Add the original name (camelCase)
+    let keyCamel = newLit(camelName)
+    result.add newTree(nnkExprColonExpr, keyCamel, sym)
+
+    # 2. Add the generated snake_case name (if it's different)
+    if snakeName != camelName:
+      let keySnake = newLit(snakeName)
+      result.add newTree(nnkExprColonExpr, keySnake, sym)
 
 let Constants*: Table[string, float64] = autoPopulateConstants(
   accelerationOfGravity, alladiGrinstead, apery, areaOfFordCircle, artin,

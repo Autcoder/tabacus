@@ -34,6 +34,8 @@ proc main(): int =
       echo e.msg
     except CatchableError as e:
       echo "Error: ", e.msg
+    except Exception as e:
+      echo "Error: ", e.msg
 
 when isMainModule:
   quit(if main() != 0: 1 else: 0)

@@ -58,20 +58,14 @@ proc evaluateRPN*(rpnTokens: seq[Token]): float =
         let b: float = stack.pop()
         let a: float = stack.pop()
         var nativeFunc: TwoArgMathFunc
-        try:
-          nativeFunc = TwoArgFuncs[token.value]
-        except KeyError:
-          raise newException(ValueError, "Unknown function: " & token.value)
+        nativeFunc = TwoArgFuncs[token.value]
         stack.add(nativeFunc(a, b))
       elif token.value in OneArgFuncs:
         if stack.len < 1:
           raise newException(ValueError, token.value & " requires an argument")
         let arg: float = stack.pop()
         var nativeFunc: OneArgMathFunc
-        try:
-          nativeFunc = OneArgFuncs[token.value]
-        except KeyError:
-          raise newException(ValueError, "Unknown function: " & token.value)
+        nativeFunc = OneArgFuncs[token.value]
         stack.add(nativeFunc(arg))
     else:
       discard

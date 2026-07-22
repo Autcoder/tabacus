@@ -145,18 +145,6 @@ const OneArgFuncs*: Table[string, OneArgMathFunc] = {
         math.lgamma(x)
     )
   ),
-  "log2": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.log2(x)
-    )
-  ),
-  "log10": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.log10(x)
-    )
-  ),
   "sec": OneArgMathFunc(
     (
       proc(x: float): float =
