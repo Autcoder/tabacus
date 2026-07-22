@@ -2,198 +2,126 @@ import tables
 import math
 
 # Define a type for a standard one-argument math function pointer
-type OneArgMathFunc* = proc(x: float): float {.noSideEffect.}
-type TwoArgMathFunc* = proc(x, y: float): float {.noSideEffect.}
+type
+  OneArgMathFunc* = proc(x: float): float {.noSideEffect.}
+  TwoArgMathFunc* = proc(x, y: float): float {.noSideEffect.}
+
+template f1*(fn: untyped): OneArgMathFunc =
+  (
+    proc(x: float): float {.noSideEffect.} =
+      fn(x)
+  )
+
+template f2*(fn: untyped): TwoArgMathFunc =
+  (
+    proc(x, y: float): float {.noSideEffect.} =
+      fn(x, y)
+  )
 
 # Explicitly wrap the ones Nim is crying about
 const OneArgFuncs*: Table[string, OneArgMathFunc] = {
-  "sin": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.sin(x)
-    )
+  # --- Standard Trig ---
+  "sin": f1(math.sin),
+  "cos": f1(math.cos),
+  "tan": f1(math.tan),
+  "sec": f1(math.sec),
+  "csc": f1(math.csc),
+  "cot": f1(math.cot),
+
+  # --- Inverse Trig ---
+  "asin": f1(math.arcsin),
+  "arcsin": f1(math.arcsin),
+  "acos": f1(math.arccos),
+  "arccos": f1(math.arccos),
+  "atan": f1(math.arctan),
+  "arctan": f1(math.arctan),
+
+  # --- Hyperbolic ---
+  "sinh": f1(math.sinh),
+  "cosh": f1(math.cosh),
+  "tanh": f1(math.tanh),
+  "asinh": f1(math.arcsinh),
+  "arcsinh": f1(math.arcsinh),
+  "acosh": f1(math.arccosh),
+  "arccosh": f1(math.arccosh),
+  "atanh": f1(math.arctanh),
+  "arctanh": f1(math.arctanh),
+
+  # --- Powers & Roots ---
+  "sqrt": f1(math.sqrt),
+  "cbrt": f1(math.cbrt),
+  "exp": f1(math.exp),
+  "ln": f1(math.ln),
+  "log10": f1(math.log10),
+  "log2": f1(math.log2),
+
+  # --- Rounding & Utilities ---
+  "abs": f1(abs),
+  "floor": f1(math.floor),
+  "ceil": f1(math.ceil),
+  "round": f1(math.round),
+  "trunc": f1(math.trunc),
+  "sgn": f1(
+    proc(x: float): float =
+      math.sgn(x).float
   ),
-  "cos": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.cos(x)
-    )
+
+  # --- Angle Conversions ---
+  "rad2deg": f1(math.radToDeg),
+  "deg2rad": f1(math.degToRad),
+
+  # --- Special Functions ---
+  "erf": f1(math.erf),
+  "erfc": f1(math.erfc),
+  "gamma": f1(math.gamma),
+  "lgamma": f1(math.lgamma),
+  "fac": f1(
+    proc(x: float): float =
+      math.fac(x.int).float
   ),
-  "tan": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.tan(x)
-    )
-  ),
-  "sqrt": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.sqrt(x)
-    )
-  ),
-  "cbrt": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.cbrt(x)
-    )
-  ),
-  "ln": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.ln(x)
-    )
-  ),
-  "abs": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        abs(x)
-    )
-  ),
-  "floor": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.floor(x)
-    )
-  ),
-  "ceil": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.ceil(x)
-    )
-  ),
-  "exp": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.exp(x)
-    )
-  ),
-  "log10": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.log10(x)
-    )
-  ),
-  "log2": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.log2(x)
-    )
-  ),
-  "sinh": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.sinh(x)
-    )
-  ),
-  "cosh": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.cosh(x)
-    )
-  ),
-  "tanh": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.tanh(x)
-    )
-  ),
-  "atan": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.arctan(x)
-    )
-  ),
-  "coth": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.coth(x)
-    )
-  ),
-  "csc": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.csc(x)
-    )
-  ),
-  "csch": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.csch(x)
-    )
-  ),
-  "erf": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.erf(x)
-    )
-  ),
-  "erfc": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.erfc(x)
-    )
-  ),
-  "gamma": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.gamma(x)
-    )
-  ),
-  "lgamma": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.lgamma(x)
-    )
-  ),
-  "sec": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.sec(x)
-    )
-  ),
-  "sech": OneArgMathFunc(
-    (
-      proc(x: float): float =
-        math.sech(x)
-    )
+  "sinc": f1(
+    proc(x: float): float =
+      (if x == 0.0: 1.0 else: math.sin(math.PI * x) / (math.PI * x))
   ),
 }.toTable
 
-const TwoArgFuncs*: Table[system.string, TwoArgMathFunc] = {
-  "atan2": TwoArgMathFunc(
-    (
-      proc(x, y: float): float =
-        math.arctan2(x, y)
-    )
+const TwoArgFuncs*: Table[string, TwoArgMathFunc] = {
+  "atan2": f2(math.arctan2),
+  "log": f2(math.log),
+  "max": f2(max),
+  "min": f2(min),
+  "hypot": f2(math.hypot),
+  "pow": f2(math.pow),
+  "gcd": f2(
+    proc(x, y: float): float =
+      math.gcd(x.int, y.int).float
   ),
-  "log": TwoArgMathFunc(
-    (
-      proc(x, y: float): float =
-        math.log(x, y)
-    )
+  "lcm": f2(
+    proc(x, y: float): float =
+      math.lcm(x.int, y.int).float
   ),
-  "max": TwoArgMathFunc(
-    (
-      proc(x, y: float): float =
-        max(x, y)
-    )
+  "nCr": f2(
+    proc(n, r: float): float =
+      math.binom(n.int, r.int).float
   ),
-  "min": TwoArgMathFunc(
-    (
-      proc(x, y: float): float =
-        min(x, y)
-    )
+  "shl": f2(
+    proc(x, y: float): float =
+      (x.int shl y.int).float
   ),
-  "hypot": TwoArgMathFunc(
-    (
-      proc(x, y: float): float =
-        math.hypot(x, y)
-    )
+  "shr": f2(
+    proc(x, y: float): float =
+      (x.int shr y.int).float
   ),
-  "pow": TwoArgMathFunc(
-    (
-      proc(x, y: float): float =
-        math.pow(x, y)
-    )
+  "xor": f2(
+    proc(x, y: float): float =
+      (x.int xor y.int).float
+  ),
+  "and": f2(
+    proc(x, y: float): float =
+      (x.int and y.int).float
+  ),
+  "or": f2(
+    proc(x, y: float): float =
+      (x.int or y.int).float
   ),
 }.toTable
