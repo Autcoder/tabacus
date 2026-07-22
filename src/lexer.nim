@@ -21,6 +21,7 @@ type
     tkTimes
     tkUnaryMinus
     tkVar
+    tkAssign
 
   Token* = object
     kind*: Kind
@@ -62,6 +63,8 @@ proc mathLexer*(input: string): seq[Token] =
     of ',':
       result.add(Token(kind: tkComma, value: ","))
       inc i
+    of '=':
+      result.add(Token(kind: tkAssign, value: "="))
     of '0' .. '9', '.':
       makeImplicitMul(result, tkFloat)
 
