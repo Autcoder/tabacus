@@ -22,7 +22,7 @@ proc shuntingYard*(tokens: seq[Token]): seq[Token] =
     case token.kind
     of tkInvalid:
       raise newException(ValueError, "Invalid token: " & token.value)
-    of tkInt, tkFloat, tkConst:
+    of tkInt, tkFloat, tkConst, tkvar:
       output.add(token)
     of tkFunc:
       stack.add(token)

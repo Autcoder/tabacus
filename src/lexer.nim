@@ -20,6 +20,7 @@ type
     tkRPar
     tkTimes
     tkUnaryMinus
+    tkVar
 
   Token* = object
     kind*: Kind
@@ -27,7 +28,7 @@ type
     num*: float
 
 proc isValueToken(k: Kind): bool =
-  k in {tkInt, tkFloat, tkConst, tkRPar}
+  k in {tkInt, tkFloat, tkConst, tkRPar, tkVar}
 
 proc makeImplicitMul(result: var seq[Token], nextKind: Kind) =
   if result.len == 0:
@@ -36,7 +37,8 @@ proc makeImplicitMul(result: var seq[Token], nextKind: Kind) =
   let prev: Token = result[^1]
 
   let needsMul: bool =
-    isValueToken(prev.kind) and nextKind in {tkConst, tkFunc, tkLPar, tkInt, tkFloat}
+    isValueToken(prev.kind) and
+    nextKind in {tkConst, tkFunc, tkLPar, tkInt, tkFloat, tkVar}
 
   if needsMul:
     result.add(Token(kind: tkTimes, value: "*"))
@@ -96,7 +98,9 @@ proc mathLexer*(input: string): seq[Token] =
         makeImplicitMul(result, tkFunc)
         result.add(Token(kind: tkFunc, value: buf))
       else:
-        result.add(Token(kind: tkInvalid, value: buf))
+        # If it's not a known function or constant, treat it as a variable reference
+        makeImplicitMul(result, tkVar)
+        result.add(Token(kind: tkVar, value: buf))
     else:
       case c
       of '+':

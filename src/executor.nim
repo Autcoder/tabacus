@@ -3,15 +3,26 @@ import lexer
 import tables
 import funcs
 
-proc evaluateRPN*(rpnTokens: seq[Token]): float =
+# Add `vars` as a second parameter
+proc evaluateRPN*(rpnTokens: seq[Token], vars: Table[string, float]): float =
   var stack: seq[float] = @[]
 
   for token in rpnTokens:
     case token.kind
 
-    # Numbers & Constants: Just push their float values
+    # Numbers & Constants
     of tkInt, tkFloat, tkConst:
       stack.add(token.num)
+
+    # Variables lookup
+    of tkVar:
+      if token.value in vars:
+        try:
+          stack.add(vars[token.value])
+        except KeyError:
+          raise newException(ValueError, "Undefined variable: " & token.value)
+      else:
+        raise newException(ValueError, "Undefined variable: " & token.value)
 
     # Unary Operators: Pop one value, negate it, push it back
     of tkUnaryMinus:

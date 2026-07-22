@@ -1,14 +1,18 @@
-import system
-import noise
-import lexer, parser, executor
+import system, tables # standard library
+import lexer, parser, executor # own modules
+import noise # external library
 
-proc main() =
+proc main(): int =
   # Initialize the Noise instance
   var n: Noise = Noise.init()
 
   # Configure history on the instance
   n.historySetMaxLen(100)
   n.setPrompt("input> ")
+
+  # Initialize variables
+  var vars = initTable[string, float]()
+  vars["ans"] = 0.0
 
   while true:
     var inputStr: string
@@ -35,7 +39,8 @@ proc main() =
       try:
         let tokens: seq[Token] = mathLexer(inputStr)
         let rpn: seq[Token] = shuntingYard(tokens)
-        let val: float = evaluateRPN(rpn)
+        let val: float = evaluateRPN(rpn, vars)
+        vars["ans"] = val
         echo val
       except ValueError as e:
         echo "Error: ", e.msg
@@ -47,4 +52,4 @@ proc main() =
         echo "Error: ", e.msg
 
 when isMainModule:
-  main()
+  quit(if main() != 0: 1 else: 0)
